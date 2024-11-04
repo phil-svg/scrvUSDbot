@@ -1,5 +1,5 @@
 import { buildApprovalMessage, buildDebtPurchasedMessage, buildDebtUpdatedMessage, buildDepositMessage, buildRoleSetMessage, buildShutdownMessage, buildStrategyChangedMessage, buildStrategyReportedMessage, buildTransferMessage, buildUpdateAccountantMessage, buildUpdateAutoAllocateMessage, buildUpdateDefaultQueueMessage, buildUpdateDepositLimitModuleMessage, buildUpdatedMaxDebtForStrategyMessage, buildUpdateFutureRoleManagerMessage, buildUpdateMinimumTotalIdleMessage, buildUpdateProfitMaxUnlockTimeMessage, buildUpdateRoleManagerMessage, buildUpdateUseDefaultQueueMessage, buildUpdateWithdrawLimitModuleMessage, buildWithdrawMessage, } from '../telegram/Messages.js';
-import { getPastEvents, web3Call } from '../web3/generic.js';
+import { web3Call } from '../web3/generic.js';
 import { getContractFeeSplitter, getContractRewardsHandler, getContractSavingsCrvUSD } from '../web3/Helper.js';
 async function getGeneralInfo(blockNumber) {
     const feeSplitter = await getContractFeeSplitter();
@@ -132,13 +132,16 @@ export async function startSavingsCrvUSD(eventEmitter) {
     // HISTORICAL
     // const startBlock = 21087889;
     // const endBlock = 21113577;
+    /*
     const startBlock = 21114920;
     const endBlock = startBlock;
+  
     const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'Deposit', startBlock, endBlock);
     if (Array.isArray(pastEvents)) {
-        for (const event of pastEvents) {
-            await processRawEvent(eventEmitter, event);
-        }
+      for (const event of pastEvents) {
+        await processRawEvent(eventEmitter, event);
+      }
     }
+    */
 }
 //# sourceMappingURL=main.js.map

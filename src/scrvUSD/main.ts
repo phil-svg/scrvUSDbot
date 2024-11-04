@@ -179,7 +179,7 @@ export async function startSavingsCrvUSD(eventEmitter: any) {
   // HISTORICAL
   // const startBlock = 21087889;
   // const endBlock = 21113577;
-
+  /*
   const startBlock = 21114920;
   const endBlock = startBlock;
 
@@ -189,4 +189,5 @@ export async function startSavingsCrvUSD(eventEmitter: any) {
       await processRawEvent(eventEmitter, event);
     }
   }
+  */
 }
