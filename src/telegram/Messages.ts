@@ -24,9 +24,9 @@ function getGeneralInfoMessage(generalInfo: GeneralInfo) {
   const scrvUSDTag = getscrvusdTag();
   const crvUSDTag = getcrvusdTag();
 
-  return `Fee Share: ${generalInfo.lowerBoundary_percentage}%⬌${generalInfo.upperBoundary_percentage}%, now ${
+  return `Minimum Weight: ${generalInfo.lowerBoundary_percentage}% | Weight: ${
     generalInfo.weight_percentage
-  }%
+  }% | Maximum Weight ${generalInfo.upperBoundary_percentage}%
 Compute Twa: ${generalInfo.compute_twa} | Scaling Factor: ${
     generalInfo.scaling_factor
   } | Last Snapshot Tracked Value: ${

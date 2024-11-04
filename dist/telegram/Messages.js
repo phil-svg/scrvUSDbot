@@ -12,7 +12,7 @@ function getcrvusdTag() {
 function getGeneralInfoMessage(generalInfo) {
     const scrvUSDTag = getscrvusdTag();
     const crvUSDTag = getcrvusdTag();
-    return `Fee Share: ${generalInfo.lowerBoundary_percentage}%⬌${generalInfo.upperBoundary_percentage}%, now ${generalInfo.weight_percentage}%
+    return `Minimum Weight: ${generalInfo.lowerBoundary_percentage}% | Weight: ${generalInfo.weight_percentage}% | Maximum Weight ${generalInfo.upperBoundary_percentage}%
 Compute Twa: ${generalInfo.compute_twa} | Scaling Factor: ${generalInfo.scaling_factor} | Last Snapshot Tracked Value: ${generalInfo.last_snapshot_tracked_value} | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(generalInfo.totalCrvUSDDeposited)} | Price Per Share: ${generalInfo.pricePerShare.toFixed(4)}`;
 }
