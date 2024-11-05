@@ -22,7 +22,14 @@ import {
   buildWithdrawMessage,
 } from '../telegram/Messages.js';
 import { getPastEvents, web3Call } from '../web3/generic.js';
-import { getContractFeeSplitter, getContractRewardsHandler, getContractSavingsCrvUSD } from '../web3/Helper.js';
+import {
+  getContractFeeSplitter,
+  getContractFeeSplitterHttp,
+  getContractRewardsHandler,
+  getContractRewardsHandlerHttp,
+  getContractSavingsCrvUSD,
+  getContractSavingsCrvUSDHttp,
+} from '../web3/Helper.js';
 
 export interface GeneralInfo {
   scrvUSD_totalSupply: number;
@@ -41,9 +48,9 @@ export interface GeneralInfo {
 }
 
 async function getGeneralInfo(blockNumber: number): Promise<GeneralInfo> {
-  const feeSplitter = await getContractFeeSplitter();
-  const rewardsHandler = await getContractRewardsHandler();
-  const scrvUSD = await getContractSavingsCrvUSD();
+  const feeSplitter = await getContractFeeSplitterHttp();
+  const rewardsHandler = await getContractRewardsHandlerHttp();
+  const scrvUSD = await getContractSavingsCrvUSDHttp();
 
   const scrvUSD_totalSupply = Number(await web3Call(scrvUSD, 'totalSupply', [], blockNumber)) / 1e18;
   const totalCrvUSDDeposited = Number(await web3Call(scrvUSD, 'totalAssets', [], blockNumber)) / 1e18;
@@ -91,6 +98,15 @@ async function processHit(eventEmitter: any, event: any) {
     generalInfo = await getGeneralInfo(event.blockNumber);
   }
   const eventName = event.event;
+  if (!generalInfo) {
+    let retries = 0;
+    while (retries < 5 && !generalInfo) {
+      console.log(`generalInfo undefined, retrying... (${retries + 1}/5)`);
+      await new Promise((resolve) => setTimeout(resolve, 20000));
+      generalInfo = await getGeneralInfo(event.blockNumber);
+      retries++;
+    }
+  }
   console.log('generalInfo', generalInfo);
   let message = '';
 
@@ -178,15 +194,16 @@ export async function startSavingsCrvUSD(eventEmitter: any) {
 
   // HISTORICAL
   // const startBlock = 21087889;
-  // const endBlock = 21113577;
-  /*
-  const startBlock = 21120091;
-  const endBlock = startBlock;
+  // const endBlock = 21121675;
 
+  // const startBlock = 21121674;
+  // const endBlock = startBlock;
+  /*
   const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
   if (Array.isArray(pastEvents)) {
     for (const event of pastEvents) {
       await processRawEvent(eventEmitter, event);
     }
-  }*/
+  }
+  */
 }

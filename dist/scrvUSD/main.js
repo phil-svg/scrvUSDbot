@@ -1,10 +1,10 @@
 import { buildApprovalMessage, buildDebtPurchasedMessage, buildDebtUpdatedMessage, buildDepositMessage, buildRoleSetMessage, buildShutdownMessage, buildStrategyChangedMessage, buildStrategyReportedMessage, buildTransferMessage, buildUpdateAccountantMessage, buildUpdateAutoAllocateMessage, buildUpdateDefaultQueueMessage, buildUpdateDepositLimitModuleMessage, buildUpdatedMaxDebtForStrategyMessage, buildUpdateFutureRoleManagerMessage, buildUpdateMinimumTotalIdleMessage, buildUpdateProfitMaxUnlockTimeMessage, buildUpdateRoleManagerMessage, buildUpdateUseDefaultQueueMessage, buildUpdateWithdrawLimitModuleMessage, buildWithdrawMessage, } from '../telegram/Messages.js';
 import { web3Call } from '../web3/generic.js';
-import { getContractFeeSplitter, getContractRewardsHandler, getContractSavingsCrvUSD } from '../web3/Helper.js';
+import { getContractFeeSplitterHttp, getContractRewardsHandlerHttp, getContractSavingsCrvUSD, getContractSavingsCrvUSDHttp, } from '../web3/Helper.js';
 async function getGeneralInfo(blockNumber) {
-    const feeSplitter = await getContractFeeSplitter();
-    const rewardsHandler = await getContractRewardsHandler();
-    const scrvUSD = await getContractSavingsCrvUSD();
+    const feeSplitter = await getContractFeeSplitterHttp();
+    const rewardsHandler = await getContractRewardsHandlerHttp();
+    const scrvUSD = await getContractSavingsCrvUSDHttp();
     const scrvUSD_totalSupply = Number(await web3Call(scrvUSD, 'totalSupply', [], blockNumber)) / 1e18;
     const totalCrvUSDDeposited = Number(await web3Call(scrvUSD, 'totalAssets', [], blockNumber)) / 1e18;
     const pricePerShare = Number(await web3Call(scrvUSD, 'pricePerShare', [], blockNumber)) / 1e18;
@@ -49,6 +49,15 @@ async function processHit(eventEmitter, event) {
         generalInfo = await getGeneralInfo(event.blockNumber);
     }
     const eventName = event.event;
+    if (!generalInfo) {
+        let retries = 0;
+        while (retries < 5 && !generalInfo) {
+            console.log(`generalInfo undefined, retrying... (${retries + 1}/5)`);
+            await new Promise((resolve) => setTimeout(resolve, 20000));
+            generalInfo = await getGeneralInfo(event.blockNumber);
+            retries++;
+        }
+    }
     console.log('generalInfo', generalInfo);
     let message = '';
     if (eventName === 'Deposit') {
@@ -131,16 +140,16 @@ export async function startSavingsCrvUSD(eventEmitter) {
     });
     // HISTORICAL
     // const startBlock = 21087889;
-    // const endBlock = 21113577;
+    // const endBlock = 21121675;
+    // const startBlock = 21121674;
+    // const endBlock = startBlock;
     /*
-    const startBlock = 21120091;
-    const endBlock = startBlock;
-  
     const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
     if (Array.isArray(pastEvents)) {
       for (const event of pastEvents) {
         await processRawEvent(eventEmitter, event);
       }
-    }*/
+    }
+    */
 }
 //# sourceMappingURL=main.js.map
