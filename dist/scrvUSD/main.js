@@ -141,7 +141,6 @@ export async function startSavingsCrvUSD(eventEmitter) {
       for (const event of pastEvents) {
         await processRawEvent(eventEmitter, event);
       }
-    }
-    */
+    }*/
 }
 //# sourceMappingURL=main.js.map

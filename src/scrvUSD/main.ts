@@ -188,6 +188,5 @@ export async function startSavingsCrvUSD(eventEmitter: any) {
     for (const event of pastEvents) {
       await processRawEvent(eventEmitter, event);
     }
-  }
-  */
+  }*/
 }
