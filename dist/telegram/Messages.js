@@ -12,8 +12,8 @@ function getcrvusdTag() {
 function getGeneralInfoMessage(generalInfo) {
     const scrvUSDTag = getscrvusdTag();
     const crvUSDTag = getcrvusdTag();
-    return `Minimum Weight: ${generalInfo.lowerBoundary_percentage}% | Weight: ${generalInfo.weight_percentage}% | Maximum Weight ${generalInfo.upperBoundary_percentage}%
-Compute Twa: ${generalInfo.compute_twa} | Scaling Factor: ${generalInfo.scaling_factor} | Last Snapshot Tracked Value: ${generalInfo.last_snapshot_tracked_value} | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago
+    return `Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBoundary_percentage} | Current: ${generalInfo.weight_percentage}% 
+Raw Twa: ${generalInfo.compute_twa} | Scaling Factor: ${generalInfo.scaling_factor} | Last Snapshot Tracked Value: ${generalInfo.last_snapshot_tracked_value} | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(generalInfo.totalCrvUSDDeposited)} | Price Per Share: ${generalInfo.pricePerShare.toFixed(4)}`;
 }
 function getLinkLine(txHash) {
@@ -35,7 +35,7 @@ export async function buildDepositMessage(event, generalInfo) {
     const assetLink = `${formatForPrint(depositAssetsAmount)}${crvUSDTag}`;
     const sharesLink = `${formatForPrint(sharesAmount)}${scrvUSDTag}`;
     const generalInfoMessage = getGeneralInfoMessage(generalInfo);
-    const linkLine = getLinkLine(event.txHash);
+    const linkLine = getLinkLine(event.transactionHash);
     return `
 🚀${userLink} deposited ${assetLink} and reveived ${sharesLink}
 ${generalInfoMessage}
@@ -53,7 +53,7 @@ export async function buildWithdrawMessage(event, generalInfo) {
     const assetLink = `${formatForPrint(assetsAmount)}${crvUSDTag}`;
     const sharesLink = `${formatForPrint(sharesAmount)}${scrvUSDTag}`;
     const generalInfoMessage = getGeneralInfoMessage(generalInfo);
-    const linkLine = getLinkLine(event.txHash);
+    const linkLine = getLinkLine(event.transactionHash);
     return `
 User ${userLink} returned ${sharesLink} and reveived ${assetLink}
 ${generalInfoMessage}

@@ -24,12 +24,10 @@ function getGeneralInfoMessage(generalInfo: GeneralInfo) {
   const scrvUSDTag = getscrvusdTag();
   const crvUSDTag = getcrvusdTag();
 
-  return `Minimum Weight: ${generalInfo.lowerBoundary_percentage}% | Weight: ${
+  return `Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBoundary_percentage} | Current: ${
     generalInfo.weight_percentage
-  }% | Maximum Weight ${generalInfo.upperBoundary_percentage}%
-Compute Twa: ${generalInfo.compute_twa} | Scaling Factor: ${
-    generalInfo.scaling_factor
-  } | Last Snapshot Tracked Value: ${
+  }% 
+Raw Twa: ${generalInfo.compute_twa} | Scaling Factor: ${generalInfo.scaling_factor} | Last Snapshot Tracked Value: ${
     generalInfo.last_snapshot_tracked_value
   } | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(
@@ -65,7 +63,7 @@ export async function buildDepositMessage(event: any, generalInfo: GeneralInfo) 
   const sharesLink = `${formatForPrint(sharesAmount)}${scrvUSDTag}`;
 
   const generalInfoMessage = getGeneralInfoMessage(generalInfo);
-  const linkLine = getLinkLine(event.txHash);
+  const linkLine = getLinkLine(event.transactionHash);
 
   return `
 🚀${userLink} deposited ${assetLink} and reveived ${sharesLink}
@@ -89,7 +87,7 @@ export async function buildWithdrawMessage(event: any, generalInfo: GeneralInfo)
   const sharesLink = `${formatForPrint(sharesAmount)}${scrvUSDTag}`;
 
   const generalInfoMessage = getGeneralInfoMessage(generalInfo);
-  const linkLine = getLinkLine(event.txHash);
+  const linkLine = getLinkLine(event.transactionHash);
 
   return `
 User ${userLink} returned ${sharesLink} and reveived ${assetLink}

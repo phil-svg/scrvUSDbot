@@ -133,10 +133,10 @@ export async function startSavingsCrvUSD(eventEmitter) {
     // const startBlock = 21087889;
     // const endBlock = 21113577;
     /*
-    const startBlock = 21114920;
+    const startBlock = 21120091;
     const endBlock = startBlock;
   
-    const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'Deposit', startBlock, endBlock);
+    const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
     if (Array.isArray(pastEvents)) {
       for (const event of pastEvents) {
         await processRawEvent(eventEmitter, event);
