@@ -13,7 +13,7 @@ function getGeneralInfoMessage(generalInfo) {
     const scrvUSDTag = getscrvusdTag();
     const crvUSDTag = getcrvusdTag();
     let apr;
-    if (generalInfo.apr > 1000) {
+    if (generalInfo.apr > 20) {
         apr = generalInfo.apr.toFixed(0);
     }
     else {

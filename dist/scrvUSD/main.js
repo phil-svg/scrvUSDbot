@@ -12,7 +12,7 @@ async function getGeneralInfo(blockNumber) {
     const block24hAgo = Number(blockNumber) - blocksPerDay * daysToBundle;
     const pricePerShare = Number(await web3Call(scrvUSD, 'pricePerShare', [], blockNumber)) / 1e18;
     const pricePerShare24hAgo = Number(await web3Call(scrvUSD, 'pricePerShare', [], block24hAgo)) / 1e18;
-    const apr = 100 * (((pricePerShare / pricePerShare24hAgo) ^ (365 / daysToBundle)) - 1);
+    const apr = (pricePerShare / pricePerShare24hAgo) ** (365 / daysToBundle) * 100;
     const scrvUSD_totalSupply = Number(await web3Call(scrvUSD, 'totalSupply', [], blockNumber)) / 1e18;
     const totalCrvUSDDeposited = Number(await web3Call(scrvUSD, 'totalAssets', [], blockNumber)) / 1e18;
     const lowerBoundary_percentage = Number(await web3Call(rewardsHandler, 'minimum_weight', [], blockNumber)) / 100;
@@ -150,7 +150,7 @@ export async function startSavingsCrvUSD(eventEmitter) {
     // const startBlock = 21087889;
     // const endBlock = 21121675;
     /*
-    const startBlock = 21129652;
+    const startBlock = 21131572;
     const endBlock = startBlock;
   
     const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
@@ -158,7 +158,6 @@ export async function startSavingsCrvUSD(eventEmitter) {
       for (const event of pastEvents) {
         await processRawEvent(eventEmitter, event);
       }
-    }
-    */
+    }*/
 }
 //# sourceMappingURL=main.js.map
