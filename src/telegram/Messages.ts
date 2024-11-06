@@ -24,15 +24,22 @@ function getGeneralInfoMessage(generalInfo: GeneralInfo) {
   const scrvUSDTag = getscrvusdTag();
   const crvUSDTag = getcrvusdTag();
 
-  return `Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBoundary_percentage} | Current: ${
-    generalInfo.weight_percentage
-  }% 
-Raw Twa: ${generalInfo.compute_twa} | Scaling Factor: ${generalInfo.scaling_factor / 10000} | Last Snapshot: ${
-    generalInfo.last_snapshot_tracked_value
-  } | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago
+  let apr;
+  if (generalInfo.apr > 1000) {
+    apr = generalInfo.apr.toFixed(0);
+  } else {
+    apr = generalInfo.apr.toFixed(2);
+  }
+  return `APY: ${apr}%
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(
     generalInfo.totalCrvUSDDeposited
-  )} | Price Per Share: ${generalInfo.pricePerShare.toFixed(4)}`;
+  )} | Price Per Share: ${generalInfo.pricePerShare.toFixed(4)}
+Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBoundary_percentage} | Current: ${
+    generalInfo.weight_percentage
+  }%
+Raw Twa: ${generalInfo.compute_twa} | Scaling Factor: ${generalInfo.scaling_factor / 10000} | Last Snapshot: ${
+    generalInfo.last_snapshot_tracked_value
+  } | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago`;
 }
 
 function getLinkLine(txHash: string) {

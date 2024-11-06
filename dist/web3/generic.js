@@ -79,7 +79,7 @@ async function delay() {
 async function randomDelay() {
     await new Promise((resolve) => setTimeout(resolve, Math.floor(Math.random() * (400 - 200 + 1) + 200)));
 }
-export async function web3Call(CONTRACT, method, params, blockNumber = 'latest') {
+export async function web3Call(CONTRACT, method, params, blockNumber = { block: 'latest' }) {
     let shouldContinue = true;
     let retries = 0;
     while (shouldContinue && retries < 12) {
@@ -88,7 +88,7 @@ export async function web3Call(CONTRACT, method, params, blockNumber = 'latest')
         }
         catch (error) {
             if (isError(error) && !isCupsErr(error)) {
-                console.log(`${error} | method: ${method} | params: ${params} | blockNumber: ${blockNumber}`);
+                console.log(`${error} | Contract: ${CONTRACT.options.address} | method: ${method} | params: ${params} | blockNumber: ${blockNumber}`);
                 shouldContinue = false;
             }
             else {

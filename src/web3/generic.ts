@@ -1,4 +1,9 @@
 import Web3 from 'web3';
+import { Contract } from 'web3-eth-contract';
+
+interface BlockNumber {
+  block: string | number;
+}
 
 export function getWeb3WsProvider(): Web3 {
   let web3WsProvider: Web3 | null = null;
@@ -112,7 +117,7 @@ export async function web3Call(
   CONTRACT: any,
   method: string,
   params: any[],
-  blockNumber: string | number | { block: string } = 'latest'
+  blockNumber: BlockNumber | number = { block: 'latest' }
 ): Promise<any> {
   let shouldContinue = true;
   let retries = 0;
@@ -121,7 +126,9 @@ export async function web3Call(
       return await CONTRACT.methods[method](...params).call(blockNumber);
     } catch (error) {
       if (isError(error) && !isCupsErr(error)) {
-        console.log(`${error} | method: ${method} | params: ${params} | blockNumber: ${blockNumber}`);
+        console.log(
+          `${error} | Contract: ${CONTRACT.options.address} | method: ${method} | params: ${params} | blockNumber: ${blockNumber}`
+        );
         shouldContinue = false;
       } else {
         await randomDelay();

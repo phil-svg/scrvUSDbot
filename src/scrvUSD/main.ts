@@ -34,6 +34,7 @@ import {
 export interface GeneralInfo {
   scrvUSD_totalSupply: number;
   pricePerShare: number;
+  apr: number;
   totalCrvUSDDeposited: number;
   lowerBoundary_percentage: number;
   upperBoundary_percentage: number;
@@ -48,13 +49,21 @@ export interface GeneralInfo {
 }
 
 async function getGeneralInfo(blockNumber: number): Promise<GeneralInfo> {
+  blockNumber = Number(blockNumber);
   const feeSplitter = await getContractFeeSplitterHttp();
   const rewardsHandler = await getContractRewardsHandlerHttp();
   const scrvUSD = await getContractSavingsCrvUSDHttp();
 
+  const targetDate = new Date('2024-11-09T17:04:24.471Z');
+  const daysToBundle = Date.now() > targetDate.getTime() ? 7 : 4;
+  const blocksPerDay = 5 * 60 * 24;
+  const block24hAgo = Number(blockNumber) - blocksPerDay * daysToBundle;
+  const pricePerShare = Number(await web3Call(scrvUSD, 'pricePerShare', [], blockNumber)) / 1e18;
+  const pricePerShare24hAgo = Number(await web3Call(scrvUSD, 'pricePerShare', [], block24hAgo)) / 1e18;
+  const apr = 100 * (((pricePerShare / pricePerShare24hAgo) ^ (365 / daysToBundle)) - 1);
+
   const scrvUSD_totalSupply = Number(await web3Call(scrvUSD, 'totalSupply', [], blockNumber)) / 1e18;
   const totalCrvUSDDeposited = Number(await web3Call(scrvUSD, 'totalAssets', [], blockNumber)) / 1e18;
-  const pricePerShare = Number(await web3Call(scrvUSD, 'pricePerShare', [], blockNumber)) / 1e18;
   const lowerBoundary_percentage = Number(await web3Call(rewardsHandler, 'minimum_weight', [], blockNumber)) / 100;
   const compute_twa = Number(await web3Call(rewardsHandler, 'compute_twa', [], blockNumber));
   const scaling_factor = Number(await web3Call(rewardsHandler, 'scaling_factor', [], blockNumber));
@@ -75,6 +84,7 @@ async function getGeneralInfo(blockNumber: number): Promise<GeneralInfo> {
   return {
     scrvUSD_totalSupply: scrvUSD_totalSupply,
     pricePerShare: pricePerShare,
+    apr: apr,
     totalCrvUSDDeposited: totalCrvUSDDeposited,
     lowerBoundary_percentage: lowerBoundary_percentage,
     upperBoundary_percentage: upperBoundary_percentage,
@@ -195,10 +205,10 @@ export async function startSavingsCrvUSD(eventEmitter: any) {
   // HISTORICAL
   // const startBlock = 21087889;
   // const endBlock = 21121675;
-
-  // const startBlock = 21121674;
-  // const endBlock = startBlock;
   /*
+  const startBlock = 21129652;
+  const endBlock = startBlock;
+
   const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
   if (Array.isArray(pastEvents)) {
     for (const event of pastEvents) {
