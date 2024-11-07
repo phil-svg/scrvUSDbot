@@ -152,10 +152,9 @@ export async function startSavingsCrvUSD(eventEmitter) {
     // HISTORICAL
     // const startBlock = 21087889;
     // const endBlock = 21121675;
-    /*
-    const startBlock = 21133034;
+    const startBlock = 21135601;
     const endBlock = startBlock;
-  
+    /*
     const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
     if (Array.isArray(pastEvents)) {
       // await new Promise((resolve) => setTimeout(resolve, 15000)); // 15 second timeout

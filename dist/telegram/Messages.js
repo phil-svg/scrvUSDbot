@@ -19,10 +19,18 @@ function getGeneralInfoMessage(generalInfo) {
     else {
         apr = generalInfo.apr.toFixed(2);
     }
-    return `APR: ${apr}%
-Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(generalInfo.totalCrvUSDDeposited)} | Price Per Share: ${generalInfo.pricePerShare.toFixed(4)}
+    if (generalInfo.scaling_factor / 10000 === 1) {
+        return `APR: ${apr}%
+Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(generalInfo.totalCrvUSDDeposited)} | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}
 Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBoundary_percentage} | Current: ${generalInfo.weight_percentage}%
-Raw Twa: ${generalInfo.compute_twa} | Scaling Factor: ${generalInfo.scaling_factor / 10000} | Last Snapshot: ${generalInfo.last_snapshot_tracked_value} | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago`;
+Raw Twa: ${generalInfo.compute_twa / 100}% | Last Snapshot: ${generalInfo.last_snapshot_tracked_value / 100}% | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago`;
+    }
+    else {
+        return `APR: ${apr}%
+Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(generalInfo.totalCrvUSDDeposited)} | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}
+Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBoundary_percentage} | Current: ${generalInfo.weight_percentage}%
+Raw Twa: ${generalInfo.compute_twa / 100}% | Scaling Factor: ${generalInfo.scaling_factor / 10000} | Last Snapshot: ${generalInfo.last_snapshot_tracked_value / 100}% | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago`;
+    }
 }
 function getLinkLine(txHash) {
     const txHashUrl = getTxHashURLfromEtherscan(txHash);
@@ -45,7 +53,7 @@ export async function buildDepositMessage(event, generalInfo) {
     const generalInfoMessage = getGeneralInfoMessage(generalInfo);
     const linkLine = getLinkLine(event.transactionHash);
     return `
-🚀${userLink} deposited ${assetLink} and reveived ${sharesLink}
+🚀${userLink} deposited ${assetLink} and received ${sharesLink}
 ${generalInfoMessage}
 ${linkLine}
   `;
@@ -63,7 +71,7 @@ export async function buildWithdrawMessage(event, generalInfo) {
     const generalInfoMessage = getGeneralInfoMessage(generalInfo);
     const linkLine = getLinkLine(event.transactionHash);
     return `
-User${userLink} returned ${sharesLink} and reveived ${assetLink}
+User${userLink} returned ${sharesLink} and received ${assetLink}
 ${generalInfoMessage}
 ${linkLine}
   `;
