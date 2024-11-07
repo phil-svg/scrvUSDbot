@@ -30,7 +30,7 @@ function getGeneralInfoMessage(generalInfo: GeneralInfo) {
   } else {
     apr = generalInfo.apr.toFixed(2);
   }
-  return `APY: ${apr}%
+  return `APR: ${apr}%
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(
     generalInfo.totalCrvUSDDeposited
   )} | Price Per Share: ${generalInfo.pricePerShare.toFixed(4)}

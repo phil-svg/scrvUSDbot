@@ -6,14 +6,16 @@ async function getGeneralInfo(blockNumber) {
     const feeSplitter = await getContractFeeSplitterHttp();
     const rewardsHandler = await getContractRewardsHandlerHttp();
     const scrvUSD = await getContractSavingsCrvUSDHttp();
-    const targetDate = new Date('2024-11-09T17:04:24.471Z');
-    const daysToBundle = Date.now() > targetDate.getTime() ? 7 : 4;
-    const blocksPerDay = 5 * 60 * 24;
-    const block24hAgo = Number(blockNumber) - blocksPerDay * daysToBundle;
-    const pricePerShare = Number(await web3Call(scrvUSD, 'pricePerShare', [], blockNumber)) / 1e18;
-    const pricePerShare24hAgo = Number(await web3Call(scrvUSD, 'pricePerShare', [], block24hAgo)) / 1e18;
-    const apr = (pricePerShare / pricePerShare24hAgo) ** (365 / daysToBundle) * 100;
+    // const targetDate = new Date('2024-11-09T17:04:24.471Z');
+    // const daysToBundle = Date.now() > targetDate.getTime() ? 7 : 4;
+    // const blocksPerDay = 5 * 60 * 24;
+    // const block24hAgo = Number(blockNumber) - blocksPerDay * daysToBundle;
+    // const pricePerShare24hAgo = Number(await web3Call(scrvUSD, 'pricePerShare', [], block24hAgo)) / 1e18;
+    // const apr = (pricePerShare / pricePerShare24hAgo) ** (365 / daysToBundle) * 100;
     const scrvUSD_totalSupply = Number(await web3Call(scrvUSD, 'totalSupply', [], blockNumber)) / 1e18;
+    const profitUnlockingRate = Number(await web3Call(scrvUSD, 'profitUnlockingRate', [], blockNumber)) / 1e18;
+    const apr = ((profitUnlockingRate / 1e12) * 31536000 * 100) / scrvUSD_totalSupply;
+    const pricePerShare = Number(await web3Call(scrvUSD, 'pricePerShare', [], blockNumber)) / 1e18;
     const totalCrvUSDDeposited = Number(await web3Call(scrvUSD, 'totalAssets', [], blockNumber)) / 1e18;
     const lowerBoundary_percentage = Number(await web3Call(rewardsHandler, 'minimum_weight', [], blockNumber)) / 100;
     const compute_twa = Number(await web3Call(rewardsHandler, 'compute_twa', [], blockNumber));
@@ -144,20 +146,23 @@ export async function startSavingsCrvUSD(eventEmitter) {
     const subscription = contractSavingsCrvUSD.events
         .allEvents({ fromBlock: 'latest' })
         .on('data', async (event) => {
+        await new Promise((resolve) => setTimeout(resolve, 15000)); // 15 second timeout
         await processRawEvent(eventEmitter, event);
     });
     // HISTORICAL
     // const startBlock = 21087889;
     // const endBlock = 21121675;
     /*
-    const startBlock = 21131572;
+    const startBlock = 21133034;
     const endBlock = startBlock;
   
     const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
     if (Array.isArray(pastEvents)) {
+      // await new Promise((resolve) => setTimeout(resolve, 15000)); // 15 second timeout
       for (const event of pastEvents) {
         await processRawEvent(eventEmitter, event);
       }
-    }*/
+    }
+    */
 }
 //# sourceMappingURL=main.js.map

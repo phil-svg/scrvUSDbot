@@ -19,7 +19,7 @@ function getGeneralInfoMessage(generalInfo) {
     else {
         apr = generalInfo.apr.toFixed(2);
     }
-    return `APY: ${apr}%
+    return `APR: ${apr}%
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(generalInfo.totalCrvUSDDeposited)} | Price Per Share: ${generalInfo.pricePerShare.toFixed(4)}
 Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBoundary_percentage} | Current: ${generalInfo.weight_percentage}%
 Raw Twa: ${generalInfo.compute_twa} | Scaling Factor: ${generalInfo.scaling_factor / 10000} | Last Snapshot: ${generalInfo.last_snapshot_tracked_value} | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago`;
