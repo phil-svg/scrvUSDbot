@@ -1356,7 +1356,7 @@ export async function getContractSavingsCrvUSD() {
 }
 export async function getContractFeeSplitterHttp() {
     const address = '0x2dFd89449faff8a532790667baB21cF733C064f2';
-    let WEB_HTTP_ROVIDER = await getWeb3HttpProvider();
+    let WEB3_HTTP_ROVIDER = await getWeb3HttpProvider();
     const abi = [
         { anonymous: false, inputs: [], name: 'SetReceivers', type: 'event' },
         { anonymous: false, inputs: [], name: 'LivenessProtectionTriggered', type: 'event' },
@@ -1483,12 +1483,12 @@ export async function getContractFeeSplitterHttp() {
             type: 'constructor',
         },
     ];
-    const contract = new WEB_HTTP_ROVIDER.eth.Contract(abi, address);
+    const contract = new WEB3_HTTP_ROVIDER.eth.Contract(abi, address);
     return contract;
 }
 export async function getContractRewardsHandlerHttp() {
     const address = '0xE8d1E2531761406Af1615A6764B0d5fF52736F56';
-    let WEB_HTTP_ROVIDER = await getWeb3HttpProvider();
+    let WEB3_HTTP_ROVIDER = await getWeb3HttpProvider();
     const abi = [
         {
             anonymous: false,
@@ -1807,12 +1807,12 @@ export async function getContractRewardsHandlerHttp() {
             type: 'constructor',
         },
     ];
-    const contract = new WEB_HTTP_ROVIDER.eth.Contract(abi, address);
+    const contract = new WEB3_HTTP_ROVIDER.eth.Contract(abi, address);
     return contract;
 }
 export async function getContractSavingsCrvUSDHttp() {
     const address = '0x0655977feb2f289a4ab78af67bab0d17aab84367';
-    let WEB_HTTP_ROVIDER = await getWeb3HttpProvider();
+    let WEB3_HTTP_ROVIDER = await getWeb3HttpProvider();
     const abi = [
         {
             name: 'Deposit',
@@ -2706,7 +2706,98 @@ export async function getContractSavingsCrvUSDHttp() {
             outputs: [{ name: '', type: 'uint256' }],
         },
     ];
-    const contract = new WEB_HTTP_ROVIDER.eth.Contract(abi, address);
+    const contract = new WEB3_HTTP_ROVIDER.eth.Contract(abi, address);
+    return contract;
+}
+export async function getContractCrvUsdPriceAggregatorHttp() {
+    let WEB3_HTTP_ROVIDER = await getWeb3HttpProvider();
+    const address = '0xe5Afcf332a5457E8FafCD668BcE3dF953762Dfe7';
+    const abi = [
+        {
+            name: 'AddPricePair',
+            inputs: [
+                { name: 'n', type: 'uint256', indexed: false },
+                { name: 'pool', type: 'address', indexed: false },
+                { name: 'is_inverse', type: 'bool', indexed: false },
+            ],
+            anonymous: false,
+            type: 'event',
+        },
+        {
+            name: 'RemovePricePair',
+            inputs: [{ name: 'n', type: 'uint256', indexed: false }],
+            anonymous: false,
+            type: 'event',
+        },
+        {
+            name: 'MovePricePair',
+            inputs: [
+                { name: 'n_from', type: 'uint256', indexed: false },
+                { name: 'n_to', type: 'uint256', indexed: false },
+            ],
+            anonymous: false,
+            type: 'event',
+        },
+        { name: 'SetAdmin', inputs: [{ name: 'admin', type: 'address', indexed: false }], anonymous: false, type: 'event' },
+        {
+            stateMutability: 'nonpayable',
+            type: 'constructor',
+            inputs: [
+                { name: 'stablecoin', type: 'address' },
+                { name: 'sigma', type: 'uint256' },
+                { name: 'admin', type: 'address' },
+            ],
+            outputs: [],
+        },
+        {
+            stateMutability: 'nonpayable',
+            type: 'function',
+            name: 'set_admin',
+            inputs: [{ name: '_admin', type: 'address' }],
+            outputs: [],
+        },
+        { stateMutability: 'view', type: 'function', name: 'sigma', inputs: [], outputs: [{ name: '', type: 'uint256' }] },
+        {
+            stateMutability: 'view',
+            type: 'function',
+            name: 'stablecoin',
+            inputs: [],
+            outputs: [{ name: '', type: 'address' }],
+        },
+        {
+            stateMutability: 'nonpayable',
+            type: 'function',
+            name: 'add_price_pair',
+            inputs: [{ name: '_pool', type: 'address' }],
+            outputs: [],
+        },
+        {
+            stateMutability: 'nonpayable',
+            type: 'function',
+            name: 'remove_price_pair',
+            inputs: [{ name: 'n', type: 'uint256' }],
+            outputs: [],
+        },
+        { stateMutability: 'view', type: 'function', name: 'price', inputs: [], outputs: [{ name: '', type: 'uint256' }] },
+        {
+            stateMutability: 'view',
+            type: 'function',
+            name: 'price_pairs',
+            inputs: [{ name: 'arg0', type: 'uint256' }],
+            outputs: [
+                {
+                    name: '',
+                    type: 'tuple',
+                    components: [
+                        { name: 'pool', type: 'address' },
+                        { name: 'is_inverse', type: 'bool' },
+                    ],
+                },
+            ],
+        },
+        { stateMutability: 'view', type: 'function', name: 'admin', inputs: [], outputs: [{ name: '', type: 'address' }] },
+    ];
+    const contract = new WEB3_HTTP_ROVIDER.eth.Contract(abi, address);
     return contract;
 }
 //# sourceMappingURL=Helper.js.map

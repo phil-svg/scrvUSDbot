@@ -32,7 +32,7 @@ function getGeneralInfoMessage(generalInfo: GeneralInfo) {
   }
 
   if (generalInfo.scaling_factor / 10000 === 1) {
-    return `APR: ${apr}%
+    return `APR: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(3)}$
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(
       generalInfo.totalCrvUSDDeposited
     )} | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}
@@ -42,18 +42,18 @@ Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBou
 Raw Twa: ${generalInfo.compute_twa / 100}% | Last Snapshot: ${
       generalInfo.last_snapshot_tracked_value / 100
     }% | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago`;
-  } else {
-    return `APR: ${apr}%
-Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(
-      generalInfo.totalCrvUSDDeposited
-    )} | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}
-Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBoundary_percentage} | Current: ${
-      generalInfo.weight_percentage
-    }%
-Raw Twa: ${generalInfo.compute_twa / 100}% | Scaling Factor: ${generalInfo.scaling_factor / 10000} | Last Snapshot: ${
-      generalInfo.last_snapshot_tracked_value / 100
-    }% | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago`;
   }
+
+  return `APR: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(3)}$
+Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(
+    generalInfo.totalCrvUSDDeposited
+  )} | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}
+Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBoundary_percentage} | Current: ${
+    generalInfo.weight_percentage
+  }%
+Raw Twa: ${generalInfo.compute_twa / 100}% | Scaling Factor: ${generalInfo.scaling_factor / 10000} | Last Snapshot: ${
+    generalInfo.last_snapshot_tracked_value / 100
+  }% | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago`;
 }
 
 function getLinkLine(txHash: string) {
@@ -117,6 +117,19 @@ ${linkLine}
   `;
 }
 
+export async function buildStrategyReportedMessage(event: any, generalInfo: GeneralInfo) {
+  const crvUSDTag = getcrvusdTag();
+  const scrvUSDTag = getscrvusdTag();
+
+  const generalInfoMessage = getGeneralInfoMessage(generalInfo);
+  const linkLine = getLinkLine(event.transactionHash);
+  return `
+🎊 Payout to${scrvUSDTag}: ${formatForPrint(event.returnValues.gain / 1e18)}${crvUSDTag}
+${generalInfoMessage}
+${linkLine}
+  `;
+}
+
 export async function buildTransferMessage(event: any) {
   return `Hello World!`;
 }
@@ -126,10 +139,6 @@ export async function buildApprovalMessage(event: any) {
 }
 
 export async function buildStrategyChangedMessage(event: any) {
-  return `Hello World!`;
-}
-
-export async function buildStrategyReportedMessage(event: any) {
   return `Hello World!`;
 }
 

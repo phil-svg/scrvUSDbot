@@ -1,17 +1,13 @@
 import { buildApprovalMessage, buildDebtPurchasedMessage, buildDebtUpdatedMessage, buildDepositMessage, buildRoleSetMessage, buildShutdownMessage, buildStrategyChangedMessage, buildStrategyReportedMessage, buildTransferMessage, buildUpdateAccountantMessage, buildUpdateAutoAllocateMessage, buildUpdateDefaultQueueMessage, buildUpdateDepositLimitModuleMessage, buildUpdatedMaxDebtForStrategyMessage, buildUpdateFutureRoleManagerMessage, buildUpdateMinimumTotalIdleMessage, buildUpdateProfitMaxUnlockTimeMessage, buildUpdateRoleManagerMessage, buildUpdateUseDefaultQueueMessage, buildUpdateWithdrawLimitModuleMessage, buildWithdrawMessage, } from '../telegram/Messages.js';
 import { web3Call } from '../web3/generic.js';
-import { getContractFeeSplitterHttp, getContractRewardsHandlerHttp, getContractSavingsCrvUSD, getContractSavingsCrvUSDHttp, } from '../web3/Helper.js';
+import { getContractCrvUsdPriceAggregatorHttp, getContractFeeSplitterHttp, getContractRewardsHandlerHttp, getContractSavingsCrvUSD, getContractSavingsCrvUSDHttp, } from '../web3/Helper.js';
 async function getGeneralInfo(blockNumber) {
     blockNumber = Number(blockNumber);
     const feeSplitter = await getContractFeeSplitterHttp();
     const rewardsHandler = await getContractRewardsHandlerHttp();
     const scrvUSD = await getContractSavingsCrvUSDHttp();
-    // const targetDate = new Date('2024-11-09T17:04:24.471Z');
-    // const daysToBundle = Date.now() > targetDate.getTime() ? 7 : 4;
-    // const blocksPerDay = 5 * 60 * 24;
-    // const block24hAgo = Number(blockNumber) - blocksPerDay * daysToBundle;
-    // const pricePerShare24hAgo = Number(await web3Call(scrvUSD, 'pricePerShare', [], block24hAgo)) / 1e18;
-    // const apr = (pricePerShare / pricePerShare24hAgo) ** (365 / daysToBundle) * 100;
+    const crvUsdPriceAggregator = await getContractCrvUsdPriceAggregatorHttp();
+    const priceCrvUSD = Number(await web3Call(crvUsdPriceAggregator, 'price', [], blockNumber)) / 1e18;
     const scrvUSD_totalSupply = Number(await web3Call(scrvUSD, 'totalSupply', [], blockNumber)) / 1e18;
     const profitUnlockingRate = Number(await web3Call(scrvUSD, 'profitUnlockingRate', [], blockNumber)) / 1e18;
     const apr = ((profitUnlockingRate / 1e12) * 31536000 * 100) / scrvUSD_totalSupply;
@@ -29,7 +25,7 @@ async function getGeneralInfo(blockNumber) {
     const days_since_last_snapshot = seconds_since_last_snapshot / 86400;
     let upperBoundary_percentage;
     try {
-        upperBoundary_percentage = Number((await web3Call(feeSplitter, 'receivers', [1], blockNumber)).weight) / 100;
+        upperBoundary_percentage = Number((await web3Call(feeSplitter, 'receivers', [0], blockNumber)).weight) / 100;
     }
     catch (err) {
         upperBoundary_percentage = 1000 / 100;
@@ -38,6 +34,7 @@ async function getGeneralInfo(blockNumber) {
         scrvUSD_totalSupply: scrvUSD_totalSupply,
         pricePerShare: pricePerShare,
         apr: apr,
+        priceCrvUSD,
         totalCrvUSDDeposited: totalCrvUSDDeposited,
         lowerBoundary_percentage: lowerBoundary_percentage,
         upperBoundary_percentage: upperBoundary_percentage,
@@ -53,10 +50,13 @@ async function getGeneralInfo(blockNumber) {
 }
 let lastCheckedBlockNumber = 0;
 let generalInfo;
+let fetchingInfo = false;
 async function processHit(eventEmitter, event) {
-    if (event.blockNumber !== lastCheckedBlockNumber) {
+    if (event.blockNumber !== lastCheckedBlockNumber && !fetchingInfo) {
+        fetchingInfo = true;
         lastCheckedBlockNumber = event.blockNumber;
         generalInfo = await getGeneralInfo(event.blockNumber);
+        fetchingInfo = false;
     }
     const eventName = event.event;
     if (!generalInfo) {
@@ -76,6 +76,9 @@ async function processHit(eventEmitter, event) {
     if (eventName === 'Withdraw') {
         message = await buildWithdrawMessage(event, generalInfo);
     }
+    if (eventName === 'StrategyReported') {
+        message = await buildStrategyReportedMessage(event, generalInfo);
+    }
     if (eventName === 'Transfer') {
         message = await buildTransferMessage(event);
     }
@@ -84,9 +87,6 @@ async function processHit(eventEmitter, event) {
     }
     if (eventName === 'StrategyChanged') {
         message = await buildStrategyChangedMessage(event);
-    }
-    if (eventName === 'StrategyReported') {
-        message = await buildStrategyReportedMessage(event);
     }
     if (eventName === 'DebtUpdated') {
         message = await buildDebtUpdatedMessage(event);
@@ -146,18 +146,17 @@ export async function startSavingsCrvUSD(eventEmitter) {
     const subscription = contractSavingsCrvUSD.events
         .allEvents({ fromBlock: 'latest' })
         .on('data', async (event) => {
-        await new Promise((resolve) => setTimeout(resolve, 15000)); // 15 second timeout
         await processRawEvent(eventEmitter, event);
     });
     // HISTORICAL
     // const startBlock = 21087889;
     // const endBlock = 21121675;
-    const startBlock = 21135601;
-    const endBlock = startBlock;
     /*
+    const startBlock = 21151771;
+    const endBlock = startBlock;
+  
     const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
     if (Array.isArray(pastEvents)) {
-      // await new Promise((resolve) => setTimeout(resolve, 15000)); // 15 second timeout
       for (const event of pastEvents) {
         await processRawEvent(eventEmitter, event);
       }
