@@ -2800,4 +2800,25 @@ export async function getContractCrvUsdPriceAggregatorHttp() {
     const contract = new WEB3_HTTP_ROVIDER.eth.Contract(abi, address);
     return contract;
 }
+export async function getContractStablecoinLensHttp() {
+    let WEB3_HTTP_ROVIDER = await getWeb3HttpProvider();
+    const address = '0xe24e2dB9f6Bb40bBe7c1C025bc87104F5401eCd7';
+    const abi = [
+        {
+            inputs: [],
+            name: 'circulating_supply',
+            outputs: [{ name: '', type: 'uint256' }],
+            stateMutability: 'view',
+            type: 'function',
+        },
+        {
+            inputs: [{ name: '_factory', type: 'address' }],
+            outputs: [],
+            stateMutability: 'nonpayable',
+            type: 'constructor',
+        },
+    ];
+    const contract = new WEB3_HTTP_ROVIDER.eth.Contract(abi, address);
+    return contract;
+}
 //# sourceMappingURL=Helper.js.map

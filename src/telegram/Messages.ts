@@ -32,10 +32,10 @@ function getGeneralInfoMessage(generalInfo: GeneralInfo) {
   }
 
   if (generalInfo.scaling_factor / 10000 === 1) {
-    return `APR: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(3)}$
+    return `APY: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(3)}$
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(
       generalInfo.totalCrvUSDDeposited
-    )} | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}
+    )} (${generalInfo.sinkedCrvUsdPercentage.toFixed(1)}%) | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}
 Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBoundary_percentage} | Current: ${
       generalInfo.weight_percentage
     }%
@@ -47,7 +47,7 @@ Raw Twa: ${generalInfo.compute_twa / 100}% | Last Snapshot: ${
   return `APR: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(3)}$
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(
     generalInfo.totalCrvUSDDeposited
-  )} | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}
+  )} (${generalInfo.sinkedCrvUsdPercentage.toFixed(1)}%) | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}
 Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBoundary_percentage} | Current: ${
     generalInfo.weight_percentage
   }%

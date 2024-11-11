@@ -1,18 +1,21 @@
 import { buildApprovalMessage, buildDebtPurchasedMessage, buildDebtUpdatedMessage, buildDepositMessage, buildRoleSetMessage, buildShutdownMessage, buildStrategyChangedMessage, buildStrategyReportedMessage, buildTransferMessage, buildUpdateAccountantMessage, buildUpdateAutoAllocateMessage, buildUpdateDefaultQueueMessage, buildUpdateDepositLimitModuleMessage, buildUpdatedMaxDebtForStrategyMessage, buildUpdateFutureRoleManagerMessage, buildUpdateMinimumTotalIdleMessage, buildUpdateProfitMaxUnlockTimeMessage, buildUpdateRoleManagerMessage, buildUpdateUseDefaultQueueMessage, buildUpdateWithdrawLimitModuleMessage, buildWithdrawMessage, } from '../telegram/Messages.js';
 import { web3Call } from '../web3/generic.js';
-import { getContractCrvUsdPriceAggregatorHttp, getContractFeeSplitterHttp, getContractRewardsHandlerHttp, getContractSavingsCrvUSD, getContractSavingsCrvUSDHttp, } from '../web3/Helper.js';
+import { getContractCrvUsdPriceAggregatorHttp, getContractFeeSplitterHttp, getContractRewardsHandlerHttp, getContractSavingsCrvUSD, getContractSavingsCrvUSDHttp, getContractStablecoinLensHttp, } from '../web3/Helper.js';
 async function getGeneralInfo(blockNumber) {
     blockNumber = Number(blockNumber);
     const feeSplitter = await getContractFeeSplitterHttp();
     const rewardsHandler = await getContractRewardsHandlerHttp();
     const scrvUSD = await getContractSavingsCrvUSDHttp();
     const crvUsdPriceAggregator = await getContractCrvUsdPriceAggregatorHttp();
+    const stablecoinLens = await getContractStablecoinLensHttp();
     const priceCrvUSD = Number(await web3Call(crvUsdPriceAggregator, 'price', [], blockNumber)) / 1e18;
     const scrvUSD_totalSupply = Number(await web3Call(scrvUSD, 'totalSupply', [], blockNumber)) / 1e18;
     const profitUnlockingRate = Number(await web3Call(scrvUSD, 'profitUnlockingRate', [], blockNumber)) / 1e18;
     const apr = ((profitUnlockingRate / 1e12) * 31536000 * 100) / scrvUSD_totalSupply;
-    const pricePerShare = Number(await web3Call(scrvUSD, 'pricePerShare', [], blockNumber)) / 1e18;
+    const circulatingCrvUsdSupply = Number(await web3Call(stablecoinLens, 'circulating_supply', [], blockNumber)) / 1e18;
     const totalCrvUSDDeposited = Number(await web3Call(scrvUSD, 'totalAssets', [], blockNumber)) / 1e18;
+    const sinkedCrvUsdPercentage = (100 * totalCrvUSDDeposited) / circulatingCrvUsdSupply;
+    const pricePerShare = Number(await web3Call(scrvUSD, 'pricePerShare', [], blockNumber)) / 1e18;
     const lowerBoundary_percentage = Number(await web3Call(rewardsHandler, 'minimum_weight', [], blockNumber)) / 100;
     const compute_twa = Number(await web3Call(rewardsHandler, 'compute_twa', [], blockNumber));
     const scaling_factor = Number(await web3Call(rewardsHandler, 'scaling_factor', [], blockNumber));
@@ -35,6 +38,7 @@ async function getGeneralInfo(blockNumber) {
         pricePerShare: pricePerShare,
         apr: apr,
         priceCrvUSD,
+        sinkedCrvUsdPercentage: sinkedCrvUsdPercentage,
         totalCrvUSDDeposited: totalCrvUSDDeposited,
         lowerBoundary_percentage: lowerBoundary_percentage,
         upperBoundary_percentage: upperBoundary_percentage,
