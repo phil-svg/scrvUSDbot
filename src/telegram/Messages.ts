@@ -58,7 +58,7 @@ Raw Twa: ${generalInfo.compute_twa / 100}% | Scaling Factor: ${generalInfo.scali
 
 function getLinkLine(txHash: string) {
   const txHashUrl = getTxHashURLfromEtherscan(txHash);
-  const curveUrl = 'https://curve.fi/';
+  const curveUrl = 'https://crvusd.curve.fi/#/ethereum/scrvUSD/';
   const feeSplitterUrl = getBuyerURL('0x2dFd89449faff8a532790667baB21cF733C064f2');
   const rewardsHandlerUrl = getBuyerURL('0xe8d1e2531761406af1615a6764b0d5ff52736f56');
 
