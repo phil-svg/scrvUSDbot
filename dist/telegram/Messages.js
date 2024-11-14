@@ -69,7 +69,7 @@ export async function buildWithdrawMessage(event, generalInfo) {
     const generalInfoMessage = getGeneralInfoMessage(generalInfo);
     const linkLine = getLinkLine(event.transactionHash);
     return `
-User${userLink} returned ${sharesLink} and received ${assetLink}
+User${userLink} withdrew ${sharesLink} and received ${assetLink}
 ${generalInfoMessage}
 ${linkLine}
   `;
