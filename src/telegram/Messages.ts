@@ -31,10 +31,13 @@ function getGeneralInfoMessage(generalInfo: GeneralInfo) {
     apr = generalInfo.apr.toFixed(2);
   }
 
+  let weightedAprMessage = ``;
+  if (!Number.isNaN(generalInfo.weightedBorrowRate)) {
+    weightedAprMessage = `Weighted Borrow Rate: ${generalInfo.weightedBorrowRate.toFixed(2)}%`;
+  }
+
   if (generalInfo.scaling_factor / 10000 === 1) {
-    return `APY: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(
-      3
-    )}$ | Weighted Borrow Rate: ${generalInfo.weightedBorrowRate.toFixed(2)}%
+    return `APY: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(3)}$ | ${weightedAprMessage}
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(
       generalInfo.totalCrvUSDDeposited
     )} (${generalInfo.sinkedCrvUsdPercentage.toFixed(1)}%) | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}

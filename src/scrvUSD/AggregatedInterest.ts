@@ -123,9 +123,17 @@ export async function getAggregatedInterestRateWeightedByMarketTotalBorrows(bloc
 
   for (const market of markets) {
     const marketApr = await getBorrowRateForProvidedLlamma(market.llamma, blockNumber);
-    const totalBorrows = await getTotalMarketDebt(blockNumber, market.address);
+    let totalBorrows = await getTotalMarketDebt(blockNumber, market.address);
 
-    if (marketApr !== null) {
+    // Retry up to 5 times if totalBorrows is NaN
+    let retries = 0;
+    while (isNaN(totalBorrows) && retries < 5) {
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // 1 second delay
+      totalBorrows = await getTotalMarketDebt(blockNumber, market.address);
+      retries++;
+    }
+
+    if (marketApr !== null && !isNaN(totalBorrows)) {
       totalDebt += totalBorrows;
       weightedAprSum += marketApr * totalBorrows;
     }
