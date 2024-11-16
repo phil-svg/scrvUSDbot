@@ -118,6 +118,7 @@ export async function getAggregatedInterestRateWeightedByMarketTotalBorrows(bloc
   const marketsResponse = await fetchMarkets();
   const markets = marketsResponse.data;
 
+  const marketsWithData = [];
   let totalDebt = 0;
   let weightedAprSum = 0;
 
@@ -136,11 +137,34 @@ export async function getAggregatedInterestRateWeightedByMarketTotalBorrows(bloc
     if (marketApr !== null && !isNaN(totalBorrows)) {
       totalDebt += totalBorrows;
       weightedAprSum += marketApr * totalBorrows;
+      marketsWithData.push({
+        collateral: market.collateral_token,
+        apr: marketApr,
+        totalBorrows: totalBorrows,
+      });
     }
 
-    console.log('market:', market.collateral_token, 'apr:', marketApr, 'debt:', totalBorrows);
+    // console.log('market:', market.collateral_token, 'apr:', marketApr, 'debt:', totalBorrows);
   }
 
-  const weightedAverageApr = weightedAprSum / totalDebt;
+  let netYield = 0;
+  for (const market of marketsWithData) {
+    // console.log(
+    //   'market:',
+    //   market.collateral,
+    //   'apr:',
+    //   market.apr,
+    //   'debt:',
+    //   market.totalBorrows,
+    //   'num:',
+    //   (market.apr / 100) * market.totalBorrows
+    // );
+    netYield += (market.apr / 100) * market.totalBorrows;
+  }
+
+  // console.log('netYield', netYield);
+  // console.log('totalDebt', totalDebt);
+
+  const weightedAverageApr = 100 * (netYield / totalDebt);
   return weightedAverageApr;
 }

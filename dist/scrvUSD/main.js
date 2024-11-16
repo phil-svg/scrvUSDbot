@@ -153,9 +153,9 @@ export async function startSavingsCrvUSD(eventEmitter) {
         await processRawEvent(eventEmitter, event);
     });
     // HISTORICAL
-    // const startBlock = 21087889;
-    // const endBlock = 21121675;
-    // const startBlock = 21201086;
+    const startBlock = 21087889;
+    const endBlock = 21121675;
+    // const startBlock = 21202278;
     // const endBlock = startBlock;
     // const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
     // if (Array.isArray(pastEvents)) {
