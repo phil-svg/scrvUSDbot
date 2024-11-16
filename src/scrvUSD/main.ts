@@ -111,34 +111,31 @@ async function getGeneralInfo(blockNumber: number): Promise<GeneralInfo> {
   };
 }
 
-let lastCheckedBlockNumber = 0;
-let generalInfo: any;
-let fetchingInfo = false;
-
 async function processHit(eventEmitter: any, event: any) {
-  if (event.blockNumber !== lastCheckedBlockNumber && !fetchingInfo) {
-    fetchingInfo = true;
-    lastCheckedBlockNumber = event.blockNumber;
+  let generalInfo;
+  let retries = 0;
+  while (!generalInfo && retries < 5) {
     generalInfo = await getGeneralInfo(event.blockNumber);
-    fetchingInfo = false;
-  }
-  const eventName = event.event;
-  if (!generalInfo) {
-    let retries = 0;
-    while (retries < 5 && !generalInfo) {
-      console.log(`generalInfo undefined, retrying... (${retries + 1}/5)`);
-      await new Promise((resolve) => setTimeout(resolve, 20000));
-      generalInfo = await getGeneralInfo(event.blockNumber);
+    if (!generalInfo) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       retries++;
     }
   }
+  if (!generalInfo) {
+    console.log('Failed to fetch GeneralInfo');
+    return;
+  }
+
+  const eventName = event.event;
   console.log('generalInfo', generalInfo);
   let message = '';
 
   if (eventName === 'Deposit') {
     message = await buildDepositMessage(event, generalInfo);
+    console.log('Deposit-message', message);
   }
   if (eventName === 'Withdraw') {
+    console.log('Withdraw-message', message);
     message = await buildWithdrawMessage(event, generalInfo);
   }
   if (eventName === 'StrategyReported') {
