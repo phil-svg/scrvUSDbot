@@ -101,4 +101,36 @@ export async function web3Call(CONTRACT, method, params, blockNumber = { block: 
         }
     }
 }
+export async function getBlockTimeStampFromNode(blockNumber) {
+    const web3HttpProvider = new Web3(new Web3.providers.HttpProvider(process.env.WEB3_HTTP_MAINNET));
+    const MAX_RETRIES = 5; // Maximum number of retries
+    const RETRY_DELAY = 600; // Delay between retries in milliseconds
+    let retries = 0;
+    while (retries < MAX_RETRIES) {
+        try {
+            const BLOCK = await web3HttpProvider.eth.getBlock(blockNumber);
+            return Number(BLOCK.timestamp);
+        }
+        catch (error) {
+            if (error instanceof Error) {
+                const err = error;
+                if (err.code === 'ECONNABORTED') {
+                    console.log(`getBlockTimeStampFromNode connection timed out. Attempt ${retries + 1} of ${MAX_RETRIES}. Retrying in ${RETRY_DELAY / 1000} seconds.`);
+                }
+                else if (err.message && err.message.includes('CONNECTION ERROR')) {
+                    if (retries > 3) {
+                        console.log(`getBlockTimeStampFromNode connection error. Attempt ${retries + 1} of ${MAX_RETRIES}. Retrying in ${RETRY_DELAY / 1000} seconds.`);
+                    }
+                }
+                else {
+                    console.log(`Failed to get block timestamp. Attempt ${retries + 1} of ${MAX_RETRIES}. Retrying in ${RETRY_DELAY / 1000} seconds.`);
+                }
+                retries++;
+                await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
+            }
+        }
+    }
+    console.log('Failed to get block timestamp after several attempts. Please check your connection and the status of the Ethereum node.');
+    return null;
+}
 //# sourceMappingURL=generic.js.map

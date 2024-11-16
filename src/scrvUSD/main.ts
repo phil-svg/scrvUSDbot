@@ -21,7 +21,7 @@ import {
   buildUpdateWithdrawLimitModuleMessage,
   buildWithdrawMessage,
 } from '../telegram/Messages.js';
-import { getPastEvents, web3Call } from '../web3/generic.js';
+import { getBlockTimeStampFromNode, getPastEvents, web3Call } from '../web3/generic.js';
 import {
   getContractCrvUsdPriceAggregatorHttp,
   getContractFeeSplitterHttp,
@@ -30,6 +30,7 @@ import {
   getContractSavingsCrvUSDHttp,
   getContractStablecoinLensHttp,
 } from '../web3/Helper.js';
+import { getAggregatedInterestRateWeightedByMarketTotalBorrows } from './AggregatedInterest.js';
 
 export interface GeneralInfo {
   scrvUSD_totalSupply: number;
@@ -48,6 +49,7 @@ export interface GeneralInfo {
   last_snapshot_timestamp: number;
   seconds_since_last_snapshot: number;
   days_since_last_snapshot: number;
+  weightedBorrowRate: number;
 }
 
 async function getGeneralInfo(blockNumber: number): Promise<GeneralInfo> {
@@ -85,6 +87,8 @@ async function getGeneralInfo(blockNumber: number): Promise<GeneralInfo> {
   } catch (err) {
     upperBoundary_percentage = 1000 / 100;
   }
+  const aggregatedInterestRateWeightedByMarketTotalBorrows =
+    await getAggregatedInterestRateWeightedByMarketTotalBorrows(blockNumber);
 
   return {
     scrvUSD_totalSupply: scrvUSD_totalSupply,
@@ -103,6 +107,7 @@ async function getGeneralInfo(blockNumber: number): Promise<GeneralInfo> {
     last_snapshot_timestamp: last_snapshot_timestamp,
     seconds_since_last_snapshot: seconds_since_last_snapshot,
     days_since_last_snapshot: days_since_last_snapshot,
+    weightedBorrowRate: aggregatedInterestRateWeightedByMarketTotalBorrows,
   };
 }
 
@@ -205,7 +210,7 @@ async function processRawEvent(eventEmitter: any, event: any) {
 export async function startSavingsCrvUSD(eventEmitter: any) {
   const contractSavingsCrvUSD = await getContractSavingsCrvUSD();
 
-  // LIVE
+  // LIVE;
   const subscription = contractSavingsCrvUSD.events
     .allEvents({ fromBlock: 'latest' })
     .on('data', async (event: any) => {
@@ -215,15 +220,14 @@ export async function startSavingsCrvUSD(eventEmitter: any) {
   // HISTORICAL
   // const startBlock = 21087889;
   // const endBlock = 21121675;
-  /*
-  const startBlock = 21151771;
-  const endBlock = startBlock;
 
-  const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
-  if (Array.isArray(pastEvents)) {
-    for (const event of pastEvents) {
-      await processRawEvent(eventEmitter, event);
-    }
-  }
-  */
+  // const startBlock = 21201086;
+  // const endBlock = startBlock;
+
+  // const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
+  // if (Array.isArray(pastEvents)) {
+  //   for (const event of pastEvents) {
+  //     await processRawEvent(eventEmitter, event);
+  //   }
+  // }
 }

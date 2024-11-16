@@ -32,7 +32,9 @@ function getGeneralInfoMessage(generalInfo: GeneralInfo) {
   }
 
   if (generalInfo.scaling_factor / 10000 === 1) {
-    return `APY: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(3)}$
+    return `APY: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(
+      3
+    )}$ | Weighted Borrow Rate: ${generalInfo.weightedBorrowRate.toFixed(2)}%
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(
       generalInfo.totalCrvUSDDeposited
     )} (${generalInfo.sinkedCrvUsdPercentage.toFixed(1)}%) | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}
@@ -44,7 +46,9 @@ Raw Twa: ${generalInfo.compute_twa / 100}% | Last Snapshot: ${
     }% | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago`;
   }
 
-  return `APR: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(3)}$
+  return `APR: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(
+    3
+  )}$ | Weighted Borrow Rate: ${generalInfo.weightedBorrowRate.toFixed(2)}%
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(
     generalInfo.totalCrvUSDDeposited
   )} (${generalInfo.sinkedCrvUsdPercentage.toFixed(1)}%) | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}
