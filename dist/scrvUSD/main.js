@@ -58,27 +58,52 @@ async function getGeneralInfo(blockNumber) {
 async function processHit(eventEmitter, event) {
     let generalInfo;
     let retries = 0;
-    while (!generalInfo && retries < 5) {
+    while (retries < 5) {
         generalInfo = await getGeneralInfo(event.blockNumber);
         if (!generalInfo) {
             await new Promise((resolve) => setTimeout(resolve, 1000));
             retries++;
+            continue;
         }
+        // Check if any field is undefined or NaN
+        const hasInvalidField = Object.values(generalInfo).some((value) => value === undefined || Number.isNaN(value));
+        if (hasInvalidField) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            retries++;
+            continue;
+        }
+        break;
     }
-    if (!generalInfo) {
-        console.log('Failed to fetch GeneralInfo');
+    if (!generalInfo || Object.values(generalInfo).some((value) => value === undefined || Number.isNaN(value))) {
+        console.log('Failed to fetch valid GeneralInfo');
         return;
     }
     const eventName = event.event;
     console.log('generalInfo', generalInfo);
     let message = '';
     if (eventName === 'Deposit') {
-        message = await buildDepositMessage(event, generalInfo);
+        retries = 0;
+        while (retries < 5) {
+            message = await buildDepositMessage(event, generalInfo);
+            if (!message.includes('NaN')) {
+                break;
+            }
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            retries++;
+        }
         console.log('Deposit-message', message);
     }
     if (eventName === 'Withdraw') {
+        retries = 0;
+        while (retries < 5) {
+            message = await buildWithdrawMessage(event, generalInfo);
+            if (!message.includes('NaN')) {
+                break;
+            }
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            retries++;
+        }
         console.log('Withdraw-message', message);
-        message = await buildWithdrawMessage(event, generalInfo);
     }
     if (eventName === 'StrategyReported') {
         message = await buildStrategyReportedMessage(event, generalInfo);
@@ -153,9 +178,9 @@ export async function startSavingsCrvUSD(eventEmitter) {
         await processRawEvent(eventEmitter, event);
     });
     // HISTORICAL
-    const startBlock = 21087889;
-    const endBlock = 21121675;
-    // const startBlock = 21202278;
+    // const startBlock = 21087889;
+    // const endBlock = 21121675;
+    // const startBlock = 21243943;
     // const endBlock = startBlock;
     // const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
     // if (Array.isArray(pastEvents)) {
