@@ -102,7 +102,23 @@ export function send(bot: any, message: string, groupID: number) {
   }
 }
 
+function getLabels() {
+  const labels: Record<string, string> = {
+    '0x3451B6b219478037a1AC572706627FC2BDa1e812': '1Inch',
+  };
+  return labels;
+}
+
 export function shortenAddress(address: string): string {
+  const labels = getLabels();
+  const addressLower = address.toLowerCase();
+
+  for (const [labelAddress, label] of Object.entries(labels)) {
+    if (labelAddress.toLowerCase() === addressLower) {
+      return label;
+    }
+  }
+
   return address.slice(0, 7) + '..' + address.slice(-2);
 }
 
