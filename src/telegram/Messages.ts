@@ -78,7 +78,7 @@ function getLinkLine(txHash: string) {
 
 export async function buildDepositMessage(event: any, generalInfo: GeneralInfo) {
   const userUrl = getBuyerURL(event.returnValues.sender);
-  const shortenUser = shortenAddress(event.returnValues.sender);
+  const shortenUser = await shortenAddress(event.returnValues.sender);
   const userLink = hyperlink(userUrl, shortenUser);
 
   const crvUSDTag = getcrvusdTag();
@@ -102,7 +102,7 @@ ${linkLine}
 
 export async function buildWithdrawMessage(event: any, generalInfo: GeneralInfo) {
   const userUrl = getBuyerURL(event.returnValues.sender);
-  const shortenUser = shortenAddress(event.returnValues.sender);
+  const shortenUser = await shortenAddress(event.returnValues.sender);
   const userLink = hyperlink(userUrl, shortenUser);
 
   const crvUSDTag = getcrvusdTag();
