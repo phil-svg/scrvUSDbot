@@ -1,4 +1,5 @@
 import { GeneralInfo } from '../scrvUSD/main.js';
+import { FILTER_MIN_AMOUNT_FOR_PRINT } from '../scrvUSDbot.js';
 import {
   formatForPrint,
   getBuyerURL,
@@ -85,6 +86,8 @@ export async function buildDepositMessage(event: any, generalInfo: GeneralInfo) 
   const scrvUSDTag = getscrvusdTag();
 
   const depositAssetsAmount = Number(event.returnValues.assets) / 1e18;
+  console.log('depositAssetsAmount', depositAssetsAmount);
+  if (depositAssetsAmount < FILTER_MIN_AMOUNT_FOR_PRINT) return 'too smol';
   const sharesAmount = Number(event.returnValues.shares) / 1e18;
 
   const assetLink = `${formatForPrint(depositAssetsAmount)}${crvUSDTag}`;
@@ -110,6 +113,7 @@ export async function buildWithdrawMessage(event: any, generalInfo: GeneralInfo)
 
   const assetsAmount = Number(event.returnValues.assets) / 1e18;
   const sharesAmount = Number(event.returnValues.shares) / 1e18;
+  if (sharesAmount <= FILTER_MIN_AMOUNT_FOR_PRINT) return 'too smol';
 
   const assetLink = `${formatForPrint(assetsAmount)}${crvUSDTag}`;
   const sharesLink = `${formatForPrint(sharesAmount)}${scrvUSDTag}`;

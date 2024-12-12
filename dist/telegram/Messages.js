@@ -1,3 +1,4 @@
+import { FILTER_MIN_AMOUNT_FOR_PRINT } from '../scrvUSDbot.js';
 import { formatForPrint, getBuyerURL, getTokenURL, getTxHashURLfromEtherscan, hyperlink, shortenAddress, } from './TelegramBot.js';
 function getscrvusdTag() {
     const address = '0x0655977feb2f289a4ab78af67bab0d17aab84367';
@@ -49,6 +50,9 @@ export async function buildDepositMessage(event, generalInfo) {
     const crvUSDTag = getcrvusdTag();
     const scrvUSDTag = getscrvusdTag();
     const depositAssetsAmount = Number(event.returnValues.assets) / 1e18;
+    console.log('depositAssetsAmount', depositAssetsAmount);
+    if (depositAssetsAmount < FILTER_MIN_AMOUNT_FOR_PRINT)
+        return 'too smol';
     const sharesAmount = Number(event.returnValues.shares) / 1e18;
     const assetLink = `${formatForPrint(depositAssetsAmount)}${crvUSDTag}`;
     const sharesLink = `${formatForPrint(sharesAmount)}${scrvUSDTag}`;
@@ -68,6 +72,8 @@ export async function buildWithdrawMessage(event, generalInfo) {
     const scrvUSDTag = getscrvusdTag();
     const assetsAmount = Number(event.returnValues.assets) / 1e18;
     const sharesAmount = Number(event.returnValues.shares) / 1e18;
+    if (sharesAmount <= FILTER_MIN_AMOUNT_FOR_PRINT)
+        return 'too smol';
     const assetLink = `${formatForPrint(assetsAmount)}${crvUSDTag}`;
     const sharesLink = `${formatForPrint(sharesAmount)}${scrvUSDTag}`;
     const generalInfoMessage = getGeneralInfoMessage(generalInfo);

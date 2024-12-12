@@ -225,7 +225,7 @@ async function processHit(eventEmitter: any, event: any) {
     message = await buildShutdownMessage(event);
   }
 
-  if (message !== '' && message !== 'Hello World!') eventEmitter.emit('newMessage', message);
+  if (message !== '' && message !== 'Hello World!' && message !== 'too smol') eventEmitter.emit('newMessage', message);
 }
 
 async function processRawEvent(eventEmitter: any, event: any) {
@@ -247,7 +247,7 @@ export async function startSavingsCrvUSD(eventEmitter: any) {
   // const startBlock = 21087889;
   // const endBlock = 21121675;
 
-  // const startBlock = 21301347;
+  // const startBlock = 21377708;
   // const endBlock = startBlock;
 
   // const pastEvents = await getPastEvents(contractSavingsCrvUSD, 'allEvents', startBlock, endBlock);
