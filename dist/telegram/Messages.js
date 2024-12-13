@@ -25,7 +25,7 @@ function getGeneralInfoMessage(generalInfo) {
         weightedAprMessage = `Weighted Borrow Rate: ${generalInfo.weightedBorrowRate.toFixed(2)}%`;
     }
     if (generalInfo.scaling_factor / 10000 === 1) {
-        return `APY: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(3)}$ | ${weightedAprMessage}
+        return `APY: ${apr}% |${crvUSDTag} Price: ${generalInfo.priceCrvUSD.toFixed(4)}$ | ${weightedAprMessage}
 Supply${scrvUSDTag}: ${formatForPrint(generalInfo.scrvUSD_totalSupply)} | Deposited${crvUSDTag}: ${formatForPrint(generalInfo.totalCrvUSDDeposited)} (${generalInfo.sinkedCrvUsdPercentage.toFixed(1)}%) | Price Per Share: ${generalInfo.pricePerShare.toFixed(3)}
 Weight Range: ${generalInfo.lowerBoundary_percentage} ↹ ${generalInfo.upperBoundary_percentage} | Current: ${generalInfo.weight_percentage}%
 Raw Twa: ${generalInfo.compute_twa / 100}% | Last Snapshot: ${generalInfo.last_snapshot_tracked_value / 100}% | ${generalInfo.days_since_last_snapshot.toFixed(2)} days ago`;
