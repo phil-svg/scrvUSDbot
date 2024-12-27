@@ -11,7 +11,7 @@ const ENV = 'prod';
 export const url = 'wss://api.curvemonitor.com';
 
 export const FILTER_VALUE_DEXDEX = 1000000;
-export const FILTER_MIN_AMOUNT_FOR_PRINT = 10000;
+export const FILTER_MIN_AMOUNT_FOR_PRINT = 50000;
 // export const FILTER_VALUE_DEXDEX = 0;
 
 const eventEmitter = new EventEmitter();
