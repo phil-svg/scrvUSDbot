@@ -21,16 +21,18 @@ import {
   buildUpdateWithdrawLimitModuleMessage,
   buildWithdrawMessage,
 } from '../telegram/Messages.js';
-import { getBlockTimeStampFromNode, getPastEvents, web3Call } from '../web3/generic.js';
 import {
+  abi_SavingsCrvUSD,
+  address_SavingsCrvUSD,
   getContractCrvUsdPriceAggregatorHttp,
   getContractFeeSplitterHttp,
   getContractRewardsHandlerHttp,
-  getContractSavingsCrvUSD,
   getContractSavingsCrvUSDHttp,
   getContractStablecoinLensHttp,
-} from '../web3/Helper.js';
+} from './Helper.js';
 import { getAggregatedInterestRateWeightedByMarketTotalBorrows } from './AggregatedInterest.js';
+import { web3Call } from '../web3/Web3Basics.js';
+import { fetchEventsRealTime, registerHandler } from '../web3/AllEvents.js';
 
 export interface GeneralInfo {
   scrvUSD_totalSupply: number;
@@ -140,7 +142,6 @@ async function processHit(eventEmitter: any, event: any) {
   }
 
   const eventName = event.event;
-  console.log('generalInfo', generalInfo);
   let message = '';
 
   if (eventName === 'Deposit') {
@@ -153,7 +154,6 @@ async function processHit(eventEmitter: any, event: any) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       retries++;
     }
-    console.log('Deposit-message', message);
   }
   if (eventName === 'Withdraw') {
     retries = 0;
@@ -165,7 +165,6 @@ async function processHit(eventEmitter: any, event: any) {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       retries++;
     }
-    console.log('Withdraw-message', message);
   }
   if (eventName === 'StrategyReported') {
     message = await buildStrategyReportedMessage(event, generalInfo);
@@ -234,14 +233,19 @@ async function processRawEvent(eventEmitter: any, event: any) {
 }
 
 export async function startSavingsCrvUSD(eventEmitter: any) {
-  const contractSavingsCrvUSD = await getContractSavingsCrvUSD();
-
   // LIVE;
-  const subscription = contractSavingsCrvUSD.events
-    .allEvents({ fromBlock: 'latest' })
-    .on('data', async (event: any) => {
-      await processRawEvent(eventEmitter, event);
+  try {
+    registerHandler(async (logs) => {
+      const events = await fetchEventsRealTime(logs, address_SavingsCrvUSD, abi_SavingsCrvUSD, 'AllEvents');
+      if (events.length > 0) {
+        events.forEach((event: any) => {
+          processRawEvent(eventEmitter, event);
+        });
+      }
     });
+  } catch (err) {
+    console.log('Error in fetching events:', err);
+  }
 
   // HISTORICAL
   // const startBlock = 21087889;

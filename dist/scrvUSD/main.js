@@ -1,7 +1,8 @@
 import { buildApprovalMessage, buildDebtPurchasedMessage, buildDebtUpdatedMessage, buildDepositMessage, buildRoleSetMessage, buildShutdownMessage, buildStrategyChangedMessage, buildStrategyReportedMessage, buildTransferMessage, buildUpdateAccountantMessage, buildUpdateAutoAllocateMessage, buildUpdateDefaultQueueMessage, buildUpdateDepositLimitModuleMessage, buildUpdatedMaxDebtForStrategyMessage, buildUpdateFutureRoleManagerMessage, buildUpdateMinimumTotalIdleMessage, buildUpdateProfitMaxUnlockTimeMessage, buildUpdateRoleManagerMessage, buildUpdateUseDefaultQueueMessage, buildUpdateWithdrawLimitModuleMessage, buildWithdrawMessage, } from '../telegram/Messages.js';
-import { web3Call } from '../web3/generic.js';
-import { getContractCrvUsdPriceAggregatorHttp, getContractFeeSplitterHttp, getContractRewardsHandlerHttp, getContractSavingsCrvUSD, getContractSavingsCrvUSDHttp, getContractStablecoinLensHttp, } from '../web3/Helper.js';
+import { abi_SavingsCrvUSD, address_SavingsCrvUSD, getContractCrvUsdPriceAggregatorHttp, getContractFeeSplitterHttp, getContractRewardsHandlerHttp, getContractSavingsCrvUSDHttp, getContractStablecoinLensHttp, } from './Helper.js';
 import { getAggregatedInterestRateWeightedByMarketTotalBorrows } from './AggregatedInterest.js';
+import { web3Call } from '../web3/Web3Basics.js';
+import { fetchEventsRealTime, registerHandler } from '../web3/AllEvents.js';
 async function getGeneralInfo(blockNumber) {
     blockNumber = Number(blockNumber);
     const feeSplitter = await getContractFeeSplitterHttp();
@@ -79,7 +80,6 @@ async function processHit(eventEmitter, event) {
         return;
     }
     const eventName = event.event;
-    console.log('generalInfo', generalInfo);
     let message = '';
     if (eventName === 'Deposit') {
         retries = 0;
@@ -91,7 +91,6 @@ async function processHit(eventEmitter, event) {
             await new Promise((resolve) => setTimeout(resolve, 1000));
             retries++;
         }
-        console.log('Deposit-message', message);
     }
     if (eventName === 'Withdraw') {
         retries = 0;
@@ -103,7 +102,6 @@ async function processHit(eventEmitter, event) {
             await new Promise((resolve) => setTimeout(resolve, 1000));
             retries++;
         }
-        console.log('Withdraw-message', message);
     }
     if (eventName === 'StrategyReported') {
         message = await buildStrategyReportedMessage(event, generalInfo);
@@ -170,13 +168,20 @@ async function processRawEvent(eventEmitter, event) {
     await processHit(eventEmitter, event);
 }
 export async function startSavingsCrvUSD(eventEmitter) {
-    const contractSavingsCrvUSD = await getContractSavingsCrvUSD();
     // LIVE;
-    const subscription = contractSavingsCrvUSD.events
-        .allEvents({ fromBlock: 'latest' })
-        .on('data', async (event) => {
-        await processRawEvent(eventEmitter, event);
-    });
+    try {
+        registerHandler(async (logs) => {
+            const events = await fetchEventsRealTime(logs, address_SavingsCrvUSD, abi_SavingsCrvUSD, 'AllEvents');
+            if (events.length > 0) {
+                events.forEach((event) => {
+                    processRawEvent(eventEmitter, event);
+                });
+            }
+        });
+    }
+    catch (err) {
+        console.log('Error in fetching events:', err);
+    }
     // HISTORICAL
     // const startBlock = 21087889;
     // const endBlock = 21121675;
