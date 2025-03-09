@@ -1,4 +1,4 @@
-import { getWeb3HttpProvider, web3Call } from '../web3/generic.js';
+import { web3Call, web3HttpProvider } from '../web3/Web3Basics.js';
 
 interface TokenInfo {
   symbol: string;
@@ -47,7 +47,6 @@ function calculateAPYFromAPR(apr: number): number {
 }
 
 async function getBorrowRateForProvidedLlamma(LLAMMA_ADDRESS: string, blockNumber: number): Promise<number | null> {
-  let WEB3_HTTP_PROVIDER = await getWeb3HttpProvider();
   const ABI_AMM: any[] = [
     {
       stateMutability: 'view',
@@ -62,7 +61,7 @@ async function getBorrowRateForProvidedLlamma(LLAMMA_ADDRESS: string, blockNumbe
       ],
     },
   ];
-  const AMM = new WEB3_HTTP_PROVIDER.eth.Contract(ABI_AMM, LLAMMA_ADDRESS);
+  const AMM = new web3HttpProvider.eth.Contract(ABI_AMM, LLAMMA_ADDRESS);
 
   try {
     let rate = await web3Call(AMM, 'rate', [], blockNumber);
@@ -98,7 +97,6 @@ async function fetchMarkets(): Promise<MarketResponse> {
 }
 
 async function getTotalMarketDebt(blockNumber: number, controllerAddress: string) {
-  let WEB3_HTTP_PROVIDER = await getWeb3HttpProvider();
   const ABI_Controller: any[] = [
     {
       stateMutability: 'view',
@@ -108,7 +106,7 @@ async function getTotalMarketDebt(blockNumber: number, controllerAddress: string
       outputs: [{ name: '', type: 'uint256' }],
     },
   ];
-  const controller = new WEB3_HTTP_PROVIDER.eth.Contract(ABI_Controller, controllerAddress);
+  const controller = new web3HttpProvider.eth.Contract(ABI_Controller, controllerAddress);
 
   const totalDebt = await web3Call(controller, 'total_debt', [], blockNumber);
   return Number(totalDebt / 1e18);

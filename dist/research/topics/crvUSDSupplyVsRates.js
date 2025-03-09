@@ -1,7 +1,7 @@
 import { getAggregatedInterestRateWeightedByMarketTotalBorrows } from '../../scrvUSD/AggregatedInterest.js';
-import { web3Call } from '../../web3/generic.js';
 import { getContractCrvUsdControllerFactory, getContractCrvUsdPriceAggregatorHttp, getContractSavingsCrvUSDHttp, getContractStablecoinLensHttp, } from '../../scrvUSD/Helper.js';
 import fs from 'fs/promises';
+import { web3Call } from '../../web3/Web3Basics.js';
 export async function crvUSDSupplyVsRates() {
     const stablecoinLens = await getContractStablecoinLensHttp();
     const scrvUSD = await getContractSavingsCrvUSDHttp();
